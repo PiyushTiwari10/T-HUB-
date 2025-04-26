@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { Pool } = require("pg");
-const axios = require("axios");
+const { post } = require("axios");
 
 // PostgreSQL connection setup
 const pool = new Pool({
@@ -122,7 +122,7 @@ async function fetchTechData() {
       console.log(` Making request ${i+1}/${numRequests} for ${numTechnologies} technologies in ${categoryPrompt}...`);
       
       try {
-        const response = await axios.post(
+        const response = await post(
           GEMINI_API_URL,
           {
             contents: [
