@@ -16,7 +16,7 @@ const TechDetails = () => {
     const fetchTechDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/installations/${id}`);
+        const response = await axios.get(`https://t-hub-inrp.onrender.com/api/installations/${id}`);
         setTech(response.data);
         setLoading(false);
       } catch (err) {

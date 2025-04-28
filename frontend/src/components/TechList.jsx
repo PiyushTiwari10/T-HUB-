@@ -14,7 +14,7 @@ const TechList = () => {
     const fetchTechnologies = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/installations');
+        const response = await axios.get('https://t-hub-inrp.onrender.com/api/installations');
         setTechnologies(response.data);
         
         // Extract unique categories
