@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaHome, FaSearch, FaGithub, FaInfoCircle, FaBars, FaTimes } from 'react-icons/fa';
+import LogoutButton from './LogoutButton';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -67,6 +68,9 @@ const Navbar = () => {
                 <FaGithub />
                 <span>GitHub</span>
               </a>
+            </li>
+            <li>
+              <LogoutButton />
             </li>
           </ul>
 
