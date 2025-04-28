@@ -5,6 +5,7 @@ import Navbar from './Navbar';
 import TechList from './TechList';
 import TechDetails from './TechDetails';
 import Auth from './Auth';
+import About from './About';
 
 function AppContent() {
   const { isAuthenticated, loading } = useAuth();
@@ -26,6 +27,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<TechList />} />
           <Route path="/tech/:id" element={<TechDetails />} />
+          <Route path="/about" element={<About />} />
           {/* Add more routes as needed */}
         </Routes>
       </div>

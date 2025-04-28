@@ -64,7 +64,7 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <a href="https://github.com/yourusername/T-HUB-" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/PiyushTiwari10/T-HUB-" target="_blank" rel="noopener noreferrer">
                 <FaGithub />
                 <span>GitHub</span>
               </a>
