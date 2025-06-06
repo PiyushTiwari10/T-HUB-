@@ -8,12 +8,14 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "axios": "^1.9.0",
+    "date-fns": "^4.1.0",
     "next": "latest",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "socket.io-client": "^4.8.1"
   },
   "scripts": {
     "dev": "next dev",
@@ -39,8 +41,8 @@
     ]
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.4.17",
     "postcss": "^8.4.33",
-    "autoprefixer": "^10.4.17"
+    "tailwindcss": "^3.4.1"
   }
 }
