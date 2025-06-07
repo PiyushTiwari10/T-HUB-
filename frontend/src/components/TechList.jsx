@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
+import { useSearch } from '../context/SearchContext';
 
 const TechList = () => {
   const [technologies, setTechnologies] = useState([]);
@@ -8,6 +9,7 @@ const TechList = () => {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const { searchQuery } = useSearch();
 
   useEffect(() => {
     const fetchTechnologies = async () => {
@@ -30,9 +32,15 @@ const TechList = () => {
     fetchTechnologies();
   }, []);
 
-  const filteredTechnologies = selectedCategory === 'All' 
-    ? technologies 
-    : technologies.filter(tech => tech.category === selectedCategory);
+  const filteredTechnologies = technologies.filter(tech => {
+    const matchesCategory = selectedCategory === 'All' || tech.category === selectedCategory;
+    const matchesSearch = searchQuery === '' || 
+      tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (tech.description && tech.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (tech.category && tech.category.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return matchesCategory && matchesSearch;
+  });
 
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[calc(100vh-200px)] text-gray-600">
@@ -55,17 +63,19 @@ const TechList = () => {
       <h1 className="text-3xl font-bold text-slate-800 mb-8 text-center">Tech Stack Installation Guides</h1>
       
       <div className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-        <label htmlFor="category-filter" className="text-gray-700 font-medium">Filter by Category: </label>
-        <select 
-          id="category-filter"
-          value={selectedCategory} 
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="py-2.5 px-4 rounded-md border border-gray-300 shadow-sm focus:border-[#3498db] focus:ring focus:ring-[#3498db]/30 focus:ring-opacity-50 bg-white min-w-[200px]"
-        >
-          {categories.map(category => (
-            <option key={category} value={category}>{category}</option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <label htmlFor="category-filter" className="text-gray-700 font-medium whitespace-nowrap">Filter by Category: </label>
+          <select 
+            id="category-filter"
+            value={selectedCategory} 
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="py-2.5 px-4 rounded-md border border-gray-300 shadow-sm focus:border-[#3498db] focus:ring focus:ring-[#3498db]/30 focus:ring-opacity-50 bg-white min-w-[200px]"
+          >
+            {categories.map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+        </div>
       </div>
       
       {filteredTechnologies.length > 0 ? (
@@ -87,9 +97,17 @@ const TechList = () => {
         </div>
       ) : (
         <div className="text-center text-gray-500 py-10">
-          <p className="text-xl mb-2">No technologies found for "{selectedCategory}".</p>
-          {selectedCategory !== 'All' && 
-            <button onClick={() => setSelectedCategory('All')} className="text-[#3498db] hover:underline">
+          <p className="text-xl mb-2">
+            {searchQuery 
+              ? `No technologies found matching "${searchQuery}"${selectedCategory !== 'All' ? ` in ${selectedCategory}` : ''}.`
+              : `No technologies found for "${selectedCategory}".`
+            }
+          </p>
+          {(selectedCategory !== 'All' || searchQuery) && 
+            <button 
+              onClick={() => setSelectedCategory('All')} 
+              className="text-[#3498db] hover:underline"
+            >
               Show all technologies
             </button>
           }

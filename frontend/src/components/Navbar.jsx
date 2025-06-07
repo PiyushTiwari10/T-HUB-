@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaHome, FaSearch, FaGithub, FaInfoCircle, FaBars, FaTimes } from 'react-icons/fa';
+import { FaHome, FaSearch, FaGithub, FaInfoCircle, FaBars, FaTimes, FaNewspaper } from 'react-icons/fa';
 import LogoutButton from './LogoutButton';
+import { useSearch } from '../context/SearchContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { searchQuery, setSearchQuery } = useSearch();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,7 +26,6 @@ const Navbar = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
-    setSearchQuery('');
   };
 
   const navLinkClasses = "text-white font-medium flex items-center gap-2 py-1 transition-colors duration-300 hover:text-[#3498db] relative group";
@@ -78,6 +78,14 @@ const Navbar = () => {
                 <FaHome />
                 <span>Home</span>
                 {pathname === '/' && <span className="absolute bottom-[-5px] left-0 w-full h-[3px] bg-[#3498db] rounded-sm md:block hidden"></span>}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#3498db] transition-all duration-300 group-hover:w-full md:block hidden"></span>
+              </Link>
+            </li>
+            <li className="my-2.5 md:my-0 md:mx-3 w-full md:w-auto">
+              <Link href="/tech-news" className={`${navLinkClasses} ${pathname === '/tech-news' ? activeNavLinkClasses : ''}`}>
+                <FaNewspaper />
+                <span>Tech News</span>
+                {pathname === '/tech-news' && <span className="absolute bottom-[-5px] left-0 w-full h-[3px] bg-[#3498db] rounded-sm md:block hidden"></span>}
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#3498db] transition-all duration-300 group-hover:w-full md:block hidden"></span>
               </Link>
             </li>

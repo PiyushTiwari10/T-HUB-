@@ -3,6 +3,6 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/tech/[id]": "pages/tech/[id].js",
-  "/about": "pages/about.js"
+  "/tech-news": "pages/tech-news.js",
+  "/tech/[id]": "pages/tech/[id].js"
 }
