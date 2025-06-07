@@ -5,6 +5,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowLeft, FaDownload, FaBook, FaLaptop, FaTools, FaCode, FaBug, FaLightbulb, FaComments } from 'react-icons/fa';
 import ChatRoom from './chat/ChatRoom';
+import ChatRoomList from './chat/ChatRoomList';
 import { useAuth } from '../context/AuthContext';
 
 const TechDetails = () => {
@@ -16,6 +17,7 @@ const TechDetails = () => {
   const [activeTab, setActiveTab] = useState('installation');
   const [copied, setCopied] = useState(false);
   const { user } = useAuth();
+  const [selectedRoom, setSelectedRoom] = useState(null);
 
   useEffect(() => {
     if (!id) return;
@@ -321,13 +323,25 @@ const TechDetails = () => {
                 >
                   {user ? (
                     <div className="flex-1 flex flex-col">
-                      <ChatRoom 
-                        roomId={id} 
-                        currentUser={{
-                          id: user.id,
-                          username: user.user_metadata?.full_name || user.email
-                        }} 
-                      />
+                      {selectedRoom ? (
+                        <ChatRoom 
+                          roomId={selectedRoom.id} 
+                          currentUser={{
+                            id: user.id,
+                            username: user.user_metadata?.full_name || user.email
+                          }}
+                          onBack={() => setSelectedRoom(null)}
+                        />
+                      ) : (
+                        <ChatRoomList
+                          onSelectRoom={(room) => setSelectedRoom(room)}
+                          currentUser={{
+                            id: user.id,
+                            username: user.user_metadata?.full_name || user.email
+                          }}
+                          techId={id}
+                        />
+                      )}
                     </div>
                   ) : (
                     <motion.div 
@@ -335,25 +349,8 @@ const TechDetails = () => {
                       animate={{ opacity: 1, y: 0 }}
                       className="flex flex-col items-center justify-center h-full text-center p-8"
                     >
-                      <motion.div
-                        animate={{ rotate: [0, 360] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      >
-                        <FaComments className="text-4xl text-gray-400 mb-4" />
-                      </motion.div>
-                      <h3 className="text-xl font-semibold text-gray-700 mb-2">Join the Community Chat</h3>
-                      <p className="text-gray-500 mb-4">Sign in to participate in the community discussion about {tech.name}</p>
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Link 
-                          href="/login" 
-                          className="inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-white font-medium no-underline transition-all duration-300 bg-[#3498db] hover:bg-[#2980b9]"
-                        >
-                          Sign In
-                        </Link>
-                      </motion.div>
+                      <p className="text-lg font-medium text-gray-800 mb-2">Sign in to join the chat</p>
+                      <p className="text-gray-600">Create and join chat rooms to discuss this technology with others.</p>
                     </motion.div>
                   )}
                 </motion.div>

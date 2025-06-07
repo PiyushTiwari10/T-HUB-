@@ -35,6 +35,32 @@ function initializeSocket(server) {
         }
     }
 
+    // Function to add user to chat room members
+    async function addUserToRoom(roomId, userId, username) {
+        try {
+            await pool.query(
+                'INSERT INTO chat_room_members (chat_room_id, user_id) VALUES ($1, $2) ON CONFLICT (chat_room_id, user_id) DO NOTHING',
+                [roomId, userId]
+            );
+        } catch (error) {
+            console.error('Error adding user to room:', error);
+            throw error;
+        }
+    }
+
+    // Function to remove user from chat room members
+    async function removeUserFromRoom(roomId, userId) {
+        try {
+            await pool.query(
+                'DELETE FROM chat_room_members WHERE chat_room_id = $1 AND user_id = $2',
+                [roomId, userId]
+            );
+        } catch (error) {
+            console.error('Error removing user from room:', error);
+            throw error;
+        }
+    }
+
     io.on('connection', (socket) => {
         console.log('User connected:', socket.id);
 
@@ -43,6 +69,9 @@ function initializeSocket(server) {
             try {
                 // Ensure chat room exists before joining
                 await ensureChatRoom(roomId);
+                
+                // Add user to room members in database
+                await addUserToRoom(roomId, userId, username);
                 
                 socket.join(roomId);
                 
@@ -70,13 +99,16 @@ function initializeSocket(server) {
         });
 
         // Leave a chat room
-        socket.on('leave_room', ({ roomId, userId }, callback) => {
+        socket.on('leave_room', async ({ roomId, userId }, callback) => {
             try {
                 socket.leave(roomId);
                 
                 // Remove user from active users
                 if (activeUsers.has(roomId)) {
                     activeUsers.get(roomId).delete(socket.id);
+                    
+                    // Remove user from room members in database
+                    await removeUserFromRoom(roomId, userId);
                     
                     // Notify others that user left
                     socket.to(roomId).emit('user_left', {
@@ -224,22 +256,29 @@ function initializeSocket(server) {
         });
 
         // Handle disconnection
-        socket.on('disconnect', () => {
+        socket.on('disconnect', async () => {
             console.log('User disconnected:', socket.id);
             
             // Remove user from all rooms they were in
-            activeUsers.forEach((users, roomId) => {
+            for (const [roomId, users] of activeUsers.entries()) {
                 if (users.has(socket.id)) {
                     const user = users.get(socket.id);
                     users.delete(socket.id);
                     
-                    // Notify others that user left
-                    io.to(roomId).emit('user_left', {
-                        userId: user.userId,
-                        activeUsers: Array.from(users.values())
-                    });
+                    try {
+                        // Remove user from room members in database
+                        await removeUserFromRoom(roomId, user.userId);
+                        
+                        // Notify others that user left
+                        io.to(roomId).emit('user_left', {
+                            userId: user.userId,
+                            activeUsers: Array.from(users.values())
+                        });
+                    } catch (error) {
+                        console.error('Error handling user disconnect:', error);
+                    }
                 }
-            });
+            }
         });
     });
 

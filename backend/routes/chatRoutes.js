@@ -2,12 +2,36 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 
-// Get all chat rooms
+// Function to generate a random 8-character alphanumeric ID
+function generateRoomId() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
+// Get all chat rooms with active user counts
 router.get('/rooms', async (req, res) => {
     try {
-        const result = await pool.query(
-            'SELECT * FROM chat_rooms WHERE is_active = true ORDER BY created_at DESC'
-        );
+        const { search } = req.query;
+        let query = `
+            SELECT cr.*, 
+                    (SELECT COUNT(*) FROM chat_room_members WHERE chat_room_id = cr.id) as active_users
+             FROM chat_rooms cr 
+             WHERE cr.is_active = true
+        `;
+        const params = [];
+
+        if (search) {
+            query += ` AND (cr.room_id ILIKE $1 OR cr.name ILIKE $1)`;
+            params.push(`%${search}%`);
+        }
+
+        query += ` ORDER BY cr.created_at DESC`;
+
+        const result = await pool.query(query, params);
         res.json(result.rows);
     } catch (err) {
         console.error(err);
@@ -19,10 +43,16 @@ router.get('/rooms', async (req, res) => {
 router.get('/rooms/tech/:techId', async (req, res) => {
     try {
         const { techId } = req.params;
-        const result = await pool.query(
-            'SELECT * FROM chat_rooms WHERE technology_id = $1 AND is_active = true',
-            [techId]
-        );
+        const { search } = req.query;
+        let query = 'SELECT * FROM chat_rooms WHERE technology_id = $1 AND is_active = true';
+        const params = [techId];
+
+        if (search) {
+            query += ` AND (room_id ILIKE $2 OR name ILIKE $2)`;
+            params.push(`%${search}%`);
+        }
+
+        const result = await pool.query(query, params);
         res.json(result.rows);
     } catch (err) {
         console.error(err);
@@ -34,9 +64,11 @@ router.get('/rooms/tech/:techId', async (req, res) => {
 router.post('/rooms', async (req, res) => {
     try {
         const { technology_id, name, description } = req.body;
+        const room_id = generateRoomId();
+        
         const result = await pool.query(
-            'INSERT INTO chat_rooms (technology_id, name, description) VALUES ($1, $2, $3) RETURNING *',
-            [technology_id, name, description]
+            'INSERT INTO chat_rooms (room_id, technology_id, name, description) VALUES ($1, $2, $3, $4) RETURNING *',
+            [room_id, technology_id, name, description]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {

@@ -6,7 +6,7 @@ import ActiveUsers from './ActiveUsers';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaUsers, FaTimes, FaChevronLeft } from 'react-icons/fa';
 
-const ChatRoom = ({ roomId, currentUser }) => {
+const ChatRoom = ({ roomId, currentUser, onBack }) => {
     const [messages, setMessages] = useState([]);
     const [activeUsers, setActiveUsers] = useState([]);
     const [typingUsers, setTypingUsers] = useState(new Map());
@@ -282,17 +282,18 @@ const ChatRoom = ({ roomId, currentUser }) => {
             {/* Header */}
             <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#3498db] to-[#2c3e50] text-white">
                 <div className="flex items-center gap-3">
-                    {isMobile && (
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => window.history.back()}
-                            className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                        >
-                            <FaChevronLeft className="w-5 h-5" />
-                        </motion.button>
-                    )}
-                    <h2 className="text-lg font-semibold">Community Chat</h2>
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={onBack}
+                        className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                    >
+                        <FaChevronLeft className="w-5 h-5" />
+                    </motion.button>
+                    <div>
+                        <h2 className="text-lg font-semibold">Community Chat</h2>
+                        <p className="text-sm text-gray-200 font-mono">Room ID: {roomId}</p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-4">
                     <motion.button

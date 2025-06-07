@@ -90,10 +90,10 @@ const Navbar = () => {
               </Link>
             </li>
             <li className="my-2.5 md:my-0 md:mx-3 w-full md:w-auto">
-              <Link href="/about" className={`${navLinkClasses} ${pathname.includes('/about') ? activeNavLinkClasses : ''}`}>
+              <Link href="/about" className={`${navLinkClasses} ${pathname?.includes('/about') ? activeNavLinkClasses : ''}`}>
                 <FaInfoCircle />
                 <span>About</span>
-                {pathname.includes('/about') && <span className="absolute bottom-[-5px] left-0 w-full h-[3px] bg-[#3498db] rounded-sm md:block hidden"></span>}
+                {pathname?.includes('/about') && <span className="absolute bottom-[-5px] left-0 w-full h-[3px] bg-[#3498db] rounded-sm md:block hidden"></span>}
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#3498db] transition-all duration-300 group-hover:w-full md:block hidden"></span>
               </Link>
             </li>

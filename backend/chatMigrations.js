@@ -5,12 +5,14 @@ const createChatTables = async () => {
         // Chat Rooms Table
         `CREATE TABLE IF NOT EXISTS chat_rooms (
             id SERIAL PRIMARY KEY,
+            room_id VARCHAR(8) UNIQUE NOT NULL,
             technology_id INTEGER REFERENCES technologies(id),
             name VARCHAR(255) NOT NULL,
             description TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             is_active BOOLEAN DEFAULT true
         )`,
+        `CREATE INDEX IF NOT EXISTS idx_chat_rooms_room_id ON chat_rooms(room_id)`,
 
         // Messages Table
         `CREATE TABLE IF NOT EXISTS messages (
