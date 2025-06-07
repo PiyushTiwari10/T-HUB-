@@ -3,14 +3,40 @@ import { io } from 'socket.io-client';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import ActiveUsers from './ActiveUsers';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaUsers, FaTimes, FaChevronLeft } from 'react-icons/fa';
 
 const ChatRoom = ({ roomId, currentUser }) => {
     const [messages, setMessages] = useState([]);
     const [activeUsers, setActiveUsers] = useState([]);
     const [typingUsers, setTypingUsers] = useState(new Map());
     const [error, setError] = useState(null);
+    const [showUsers, setShowUsers] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const socketRef = useRef();
     const messagesEndRef = useRef(null);
+    const chatContainerRef = useRef(null);
+
+    // Check if mobile on mount and window resize
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Handle keyboard shortcuts
+    useEffect(() => {
+        const handleKeyPress = (e) => {
+            if (e.key === 'Escape' && showUsers) {
+                setShowUsers(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyPress);
+        return () => window.removeEventListener('keydown', handleKeyPress);
+    }, [showUsers]);
 
     useEffect(() => {
         console.log('ChatRoom mounted with:', { roomId, currentUser });
@@ -252,16 +278,47 @@ const ChatRoom = ({ roomId, currentUser }) => {
     console.log('Current messages state:', messages);
 
     return (
-        <div className="flex h-full bg-gray-100">
-            {error && (
-                <div className="absolute top-0 left-0 right-0 bg-red-500 text-white p-2 text-center">
-                    {error}
+        <div className="flex flex-col h-[calc(100vh-2rem)] md:h-[500px] bg-white rounded-lg shadow-lg overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#3498db] to-[#2c3e50] text-white">
+                <div className="flex items-center gap-3">
+                    {isMobile && (
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => window.history.back()}
+                            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <FaChevronLeft className="w-5 h-5" />
+                        </motion.button>
+                    )}
+                    <h2 className="text-lg font-semibold">Community Chat</h2>
                 </div>
-            )}
-            <div className="flex w-full bg-white shadow-lg">
-                <ActiveUsers users={activeUsers} />
-                <div className="flex-1 flex flex-col">
-                    <div className="flex-1 p-4 overflow-y-auto">
+                <div className="flex items-center gap-4">
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setShowUsers(!showUsers)}
+                        className="p-2 rounded-full hover:bg-white/10 transition-colors relative"
+                    >
+                        <FaUsers className="w-5 h-5" />
+                        {activeUsers.length > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                {activeUsers.length}
+                            </span>
+                        )}
+                    </motion.button>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex flex-1 overflow-hidden">
+                {/* Messages Area */}
+                <div 
+                    ref={chatContainerRef}
+                    className="flex-1 flex flex-col overflow-hidden"
+                >
+                    <div className="flex-1 overflow-y-auto p-4 scroll-smooth">
                         <MessageList
                             messages={messages}
                             currentUser={currentUser}
@@ -271,18 +328,79 @@ const ChatRoom = ({ roomId, currentUser }) => {
                             onRemoveReaction={handleRemoveReaction}
                         />
                         <div ref={messagesEndRef} />
-                        {typingUsers.size > 0 && (
-                            <div className="text-sm text-gray-500 italic p-2">
-                                {Array.from(typingUsers.values()).join(', ')} {typingUsers.size === 1 ? 'is' : 'are'} typing...
-                            </div>
-                        )}
                     </div>
+
+                    {/* Typing Indicator */}
+                    <AnimatePresence>
+                        {typingUsers.size > 0 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="px-4 py-2 text-sm text-gray-500 italic bg-gray-50"
+                            >
+                                {Array.from(typingUsers.values()).join(', ')} {typingUsers.size === 1 ? 'is' : 'are'} typing...
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Error Message */}
+                    <AnimatePresence>
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="px-4 py-2 text-sm text-red-500 bg-red-50"
+                            >
+                                {error}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Message Input */}
                     <MessageInput
                         onSendMessage={handleSendMessage}
-                        onTyping={() => socketRef.current.emit('typing', { roomId, userId: currentUser.id, username: currentUser.username })}
-                        onStopTyping={() => socketRef.current.emit('stop_typing', { roomId, userId: currentUser.id })}
+                        onTyping={() => socketRef.current?.emit('typing', { roomId, userId: currentUser.id, username: currentUser.username })}
+                        onStopTyping={() => socketRef.current?.emit('stop_typing', { roomId, userId: currentUser.id })}
                     />
                 </div>
+
+                {/* Active Users Sidebar */}
+                <AnimatePresence>
+                    {showUsers && (
+                        <>
+                            {/* Mobile Overlay */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="fixed inset-0 bg-black/50 md:hidden z-40"
+                                onClick={() => setShowUsers(false)}
+                            />
+                            
+                            {/* Users Panel */}
+                            <motion.div
+                                initial={{ x: '100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: '100%' }}
+                                transition={{ type: 'spring', damping: 20 }}
+                                className="fixed md:relative right-0 top-0 h-full w-[280px] bg-white shadow-lg z-50 md:z-0"
+                            >
+                                <div className="flex items-center justify-between p-4 border-b">
+                                    <h3 className="font-semibold text-gray-800">Active Users ({activeUsers.length})</h3>
+                                    <button
+                                        onClick={() => setShowUsers(false)}
+                                        className="p-2 rounded-full hover:bg-gray-100 md:hidden"
+                                    >
+                                        <FaTimes className="w-5 h-5 text-gray-500" />
+                                    </button>
+                                </div>
+                                <ActiveUsers users={activeUsers} currentUser={currentUser} />
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );

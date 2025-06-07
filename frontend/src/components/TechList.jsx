@@ -102,114 +102,116 @@ const TechList = () => {
   );
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="p-5 md:p-8"
-    >
-      <motion.h1 
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="text-4xl font-bold text-slate-800 mb-8 text-center bg-gradient-to-r from-[#3498db] to-[#2c3e50] bg-clip-text text-transparent"
-      >
-        Tech Stack Installation Guides
-      </motion.h1>
-      
+    <div className="w-full overflow-x-hidden">
       <motion.div 
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8"
       >
-        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-md">
-          <FaFilter className="text-[#3498db]" />
-          <label htmlFor="category-filter" className="text-gray-700 font-medium whitespace-nowrap">Filter by Category: </label>
-          <select 
-            id="category-filter"
-            value={selectedCategory} 
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="py-2 px-4 rounded-md border border-gray-300 shadow-sm focus:border-[#3498db] focus:ring focus:ring-[#3498db]/30 focus:ring-opacity-50 bg-white min-w-[200px]"
-          >
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
-        </div>
-      </motion.div>
-      
-      <AnimatePresence mode="wait">
-        {filteredTechnologies.length > 0 ? (
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          >
-            {filteredTechnologies.map(tech => (
-              <motion.div
-                key={tech.id}
-                variants={itemVariants}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Link 
-                  href={`/tech/${tech.id}`} 
-                  className="group block bg-white rounded-xl shadow-lg p-6 transition-all duration-300 ease-in-out hover:shadow-2xl no-underline text-gray-800 border border-transparent hover:border-[#3498db] relative overflow-hidden"
+        <motion.h1 
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="text-3xl sm:text-4xl font-bold text-slate-800 mb-8 text-center bg-gradient-to-r from-[#3498db] to-[#2c3e50] bg-clip-text text-transparent"
+        >
+          Tech Stack Installation Guides
+        </motion.h1>
+        
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-4"
+        >
+          <div className="w-full sm:w-auto flex items-center gap-2 bg-white p-2 rounded-lg shadow-md">
+            <FaFilter className="text-[#3498db]" />
+            <label htmlFor="category-filter" className="text-gray-700 font-medium whitespace-nowrap">Filter by Category: </label>
+            <select 
+              id="category-filter"
+              value={selectedCategory} 
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="py-2 px-4 rounded-md border border-gray-300 shadow-sm focus:border-[#3498db] focus:ring focus:ring-[#3498db]/30 focus:ring-opacity-50 bg-white w-full sm:w-auto min-w-[200px]"
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </div>
+        </motion.div>
+        
+        <AnimatePresence mode="wait">
+          {filteredTechnologies.length > 0 ? (
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+            >
+              {filteredTechnologies.map(tech => (
+                <motion.div
+                  key={tech.id}
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-[#3498db]/5 to-[#2c3e50]/5 opacity-0 group-hover:opacity-100 transition-opacity"
-                    initial={false}
-                    animate={{ opacity: 0 }}
-                    whileHover={{ opacity: 1 }}
-                  />
-                  <h2 className="text-xl font-semibold text-slate-700 mb-2 group-hover:text-[#3498db] transition-colors">{tech.name}</h2>
-                  {tech.category && (
-                    <motion.div 
-                      className="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-medium mb-3 group-hover:bg-[#3498db]/20 group-hover:text-[#3498db] transition-colors"
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      {tech.category}
-                    </motion.div>
-                  )}
-                  {tech.version && (
-                    <div className="text-sm text-gray-500 mb-3 flex items-center gap-2">
-                      <span className="w-2 h-2 bg-[#3498db] rounded-full" />
-                      Version: {tech.version}
-                    </div>
-                  )}
-                  {tech.description && (
-                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">{tech.description}</p>
-                  )}
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        ) : (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center text-gray-500 py-10"
-          >
-            <FaSearch className="text-4xl text-gray-400 mx-auto mb-4" />
-            <p className="text-xl mb-2">
-              {searchQuery 
-                ? `No technologies found matching "${searchQuery}"${selectedCategory !== 'All' ? ` in ${selectedCategory}` : ''}.`
-                : `No technologies found for "${selectedCategory}".`
-              }
-            </p>
-            {(selectedCategory !== 'All' || searchQuery) && (
-              <motion.button 
-                onClick={() => setSelectedCategory('All')} 
-                className="text-[#3498db] hover:underline mt-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Show all technologies
-              </motion.button>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+                  <Link 
+                    href={`/tech/${tech.id}`} 
+                    className="group block bg-white rounded-xl shadow-lg p-4 sm:p-6 transition-all duration-300 ease-in-out hover:shadow-2xl no-underline text-gray-800 border border-transparent hover:border-[#3498db] relative overflow-hidden"
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-[#3498db]/5 to-[#2c3e50]/5 opacity-0 group-hover:opacity-100 transition-opacity"
+                      initial={false}
+                      animate={{ opacity: 0 }}
+                      whileHover={{ opacity: 1 }}
+                    />
+                    <h2 className="text-lg sm:text-xl font-semibold text-slate-700 mb-2 group-hover:text-[#3498db] transition-colors">{tech.name}</h2>
+                    {tech.category && (
+                      <motion.div 
+                        className="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-medium mb-3 group-hover:bg-[#3498db]/20 group-hover:text-[#3498db] transition-colors"
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        {tech.category}
+                      </motion.div>
+                    )}
+                    {tech.version && (
+                      <div className="text-sm text-gray-500 mb-3 flex items-center gap-2">
+                        <span className="w-2 h-2 bg-[#3498db] rounded-full" />
+                        Version: {tech.version}
+                      </div>
+                    )}
+                    {tech.description && (
+                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">{tech.description}</p>
+                    )}
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center text-gray-500 py-10"
+            >
+              <FaSearch className="text-4xl text-gray-400 mx-auto mb-4" />
+              <p className="text-lg sm:text-xl mb-2">
+                {searchQuery 
+                  ? `No technologies found matching "${searchQuery}"${selectedCategory !== 'All' ? ` in ${selectedCategory}` : ''}.`
+                  : `No technologies found for "${selectedCategory}".`
+                }
+              </p>
+              {(selectedCategory !== 'All' || searchQuery) && (
+                <motion.button 
+                  onClick={() => setSelectedCategory('All')} 
+                  className="text-[#3498db] hover:underline mt-2"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Show all technologies
+                </motion.button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </div>
   );
 };
 
