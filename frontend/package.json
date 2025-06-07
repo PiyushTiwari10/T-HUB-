@@ -3,19 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@headlessui/react": "^2.2.4",
+    "@heroicons/react": "^2.2.0",
     "@supabase/supabase-js": "^2.49.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
+    "framer-motion": "^12.16.0",
     "next": "latest",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
-    "socket.io-client": "^4.8.1"
+    "react-intersection-observer": "^9.16.0",
+    "socket.io-client": "^4.8.1",
+    "tailwindcss-animate": "^1.0.7"
   },
   "scripts": {
     "dev": "next dev",

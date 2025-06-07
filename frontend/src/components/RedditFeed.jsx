@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaReddit, FaArrowUp, FaComment, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaReddit, FaArrowUp, FaComment, FaExternalLinkAlt, FaSpinner } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const RedditFeed = () => {
     const [posts, setPosts] = useState([]);
@@ -61,104 +62,151 @@ const RedditFeed = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            </div>
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex justify-center items-center h-64"
+            >
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                    <FaSpinner className="text-4xl text-blue-500" />
+                </motion.div>
+            </motion.div>
         );
     }
 
     if (error) {
         return (
-            <div className="text-center p-4 bg-red-50 text-red-600 rounded-lg">
-                <p className="font-medium mb-2">Error Loading Posts</p>
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center p-6 bg-red-50 text-red-600 rounded-lg shadow-md"
+            >
+                <p className="font-medium text-lg mb-2">Error Loading Posts</p>
                 <p className="text-sm mb-4">{error}</p>
-                <button 
+                <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={fetchPosts}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                    className="px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
                 >
                     Try Again
-                </button>
-            </div>
+                </motion.button>
+            </motion.div>
         );
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-4">
-            <div className="flex items-center gap-2 mb-6">
-                <FaReddit className="text-2xl text-orange-500" />
-                <h2 className="text-2xl font-bold">Tech Feed</h2>
-            </div>
+        <div className="max-w-4xl mx-auto">
+            <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-3 mb-8"
+            >
+                <FaReddit className="text-3xl text-orange-500" />
+                <h2 className="text-2xl font-bold text-gray-800">Tech Feed</h2>
+            </motion.div>
 
             {/* Subreddit Selector */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-                {subreddits.map((subreddit) => (
-                    <button
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex gap-3 mb-8 overflow-x-auto pb-4 scrollbar-hide"
+            >
+                {subreddits.map((subreddit, index) => (
+                    <motion.button
                         key={subreddit.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setSelectedSubreddit(subreddit.id)}
-                        className={`px-4 py-2 rounded-full whitespace-nowrap ${
+                        className={`px-5 py-2.5 rounded-full whitespace-nowrap transition-all duration-300 ${
                             selectedSubreddit === subreddit.id
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-100 hover:bg-gray-200'
+                                ? 'bg-blue-500 text-white shadow-lg'
+                                : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
                         }`}
                     >
                         r/{subreddit.id}
-                    </button>
+                    </motion.button>
                 ))}
-            </div>
+            </motion.div>
 
             {/* Posts List */}
-            <div className="space-y-4">
-                {posts.map((post) => (
-                    <div 
-                        key={post.id}
-                        className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
-                    >
-                        <div className="flex items-start gap-4">
-                            <div className="flex flex-col items-center">
-                                <FaArrowUp className="text-gray-400" />
-                                <span className="text-sm font-medium">{post.ups}</span>
-                            </div>
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                                    <span>Posted by u/{post.author}</span>
-                                    <span>•</span>
-                                    <span>{formatDate(post.created_utc)}</span>
-                                </div>
-                                <h3 className="text-lg font-semibold mb-2">
-                                    {post.title}
-                                </h3>
-                                {post.selftext && (
-                                    <p className="text-gray-600 mb-4 line-clamp-3">
-                                        {post.selftext}
-                                    </p>
-                                )}
-                                <div className="flex items-center gap-4 text-sm text-gray-500">
-                                    <a 
-                                        href={`https://reddit.com${post.permalink}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-1 hover:text-blue-500"
+            <AnimatePresence mode="wait">
+                <motion.div 
+                    key={selectedSubreddit}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="space-y-6"
+                >
+                    {posts.map((post, index) => (
+                        <motion.div 
+                            key={post.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            whileHover={{ scale: 1.02 }}
+                            className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+                        >
+                            <div className="p-6">
+                                <div className="flex items-start gap-4">
+                                    <motion.div 
+                                        whileHover={{ scale: 1.1 }}
+                                        className="flex flex-col items-center bg-gray-50 p-2 rounded-lg"
                                     >
-                                        <FaComment />
-                                        <span>{post.num_comments} comments</span>
-                                    </a>
-                                    {post.url && !post.url.includes('reddit.com') && (
-                                        <a 
-                                            href={post.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-1 hover:text-blue-500"
-                                        >
-                                            <FaExternalLinkAlt />
-                                            <span>View Link</span>
-                                        </a>
-                                    )}
+                                        <FaArrowUp className="text-blue-500" />
+                                        <span className="text-sm font-medium text-gray-700">{post.ups}</span>
+                                    </motion.div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                                            <span className="font-medium">Posted by u/{post.author}</span>
+                                            <span>•</span>
+                                            <span>{formatDate(post.created_utc)}</span>
+                                        </div>
+                                        <h3 className="text-xl font-semibold mb-3 text-gray-800 hover:text-blue-500 transition-colors">
+                                            {post.title}
+                                        </h3>
+                                        {post.selftext && (
+                                            <p className="text-gray-600 mb-4 line-clamp-3">
+                                                {post.selftext}
+                                            </p>
+                                        )}
+                                        <div className="flex items-center gap-6 text-sm">
+                                            <motion.a 
+                                                whileHover={{ scale: 1.05 }}
+                                                href={`https://reddit.com${post.permalink}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-colors"
+                                            >
+                                                <FaComment />
+                                                <span>{post.num_comments} comments</span>
+                                            </motion.a>
+                                            {post.url && !post.url.includes('reddit.com') && (
+                                                <motion.a 
+                                                    whileHover={{ scale: 1.05 }}
+                                                    href={post.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-colors"
+                                                >
+                                                    <FaExternalLinkAlt />
+                                                    <span>View Link</span>
+                                                </motion.a>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </AnimatePresence>
         </div>
     );
 };
