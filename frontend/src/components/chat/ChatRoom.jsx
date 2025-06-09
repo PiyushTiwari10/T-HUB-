@@ -298,8 +298,8 @@ const ChatRoom = ({ roomId, currentUser, onBack }) => {
                         <FaChevronLeft className="w-5 h-5" />
                     </motion.button>
                     <div>
-                        <h2 className="text-lg font-semibold">Community Chat</h2>
-                        <p className="text-sm text-gray-200 font-mono">Room ID: {roomId}</p>
+                        <h2 className="text-lg font-semibold truncate max-w-[150px] md:max-w-none">Community Chat</h2>
+                        <p className="text-sm text-gray-200 font-mono truncate max-w-[150px] md:max-w-none">Room ID: {roomId}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -324,7 +324,7 @@ const ChatRoom = ({ roomId, currentUser, onBack }) => {
                 {/* Messages Area */}
                 <div 
                     ref={chatContainerRef}
-                    className="flex-1 flex flex-col overflow-hidden"
+                    className={`flex-1 flex flex-col overflow-hidden ${showUsers && isMobile ? 'hidden' : 'block'}`}
                 >
                     <div className="flex-1 overflow-y-auto p-4 scroll-smooth">
                         <MessageList
@@ -377,36 +377,28 @@ const ChatRoom = ({ roomId, currentUser, onBack }) => {
                 {/* Active Users Sidebar */}
                 <AnimatePresence>
                     {showUsers && (
-                        <>
-                            {/* Mobile Overlay */}
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="fixed inset-0 bg-black/50 md:hidden z-40"
-                                onClick={() => setShowUsers(false)}
-                            />
-                            
-                            {/* Users Panel */}
-                            <motion.div
-                                initial={{ x: '100%' }}
-                                animate={{ x: 0 }}
-                                exit={{ x: '100%' }}
-                                transition={{ type: 'spring', damping: 20 }}
-                                className="fixed md:relative right-0 top-0 h-full w-[280px] bg-white shadow-lg z-50 md:z-0"
-                            >
-                                <div className="flex items-center justify-between p-4 border-b">
-                                    <h3 className="font-semibold text-gray-800">Active Users ({activeUsers.length})</h3>
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', damping: 20 }}
+                            className={`${isMobile ? 'fixed inset-0 z-50 bg-white' : 'w-64 border-l'} flex flex-col`}
+                        >
+                            <div className="p-4 border-b flex items-center justify-between">
+                                <h3 className="font-semibold">Active Users</h3>
+                                {isMobile && (
                                     <button
                                         onClick={() => setShowUsers(false)}
-                                        className="p-2 rounded-full hover:bg-gray-100 md:hidden"
+                                        className="p-2 rounded-full hover:bg-gray-100"
                                     >
-                                        <FaTimes className="w-5 h-5 text-gray-500" />
+                                        <FaTimes className="w-5 h-5" />
                                     </button>
-                                </div>
-                                <ActiveUsers users={activeUsers} currentUser={currentUser} />
-                            </motion.div>
-                        </>
+                                )}
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-4">
+                                <ActiveUsers users={activeUsers} />
+                            </div>
+                        </motion.div>
                     )}
                 </AnimatePresence>
             </div>

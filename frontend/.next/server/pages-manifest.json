@@ -3,7 +3,5 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/tech/[id]": "pages/tech/[id].js",
-  "/tech-news": "pages/tech-news.js",
-  "/about": "pages/about.js"
+  "/tech/[id]": "pages/tech/[id].js"
 }

@@ -1,6 +1,7 @@
 // Authentication UI Components
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import { useRouter } from 'next/router';
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
@@ -8,6 +9,22 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [message, setMessage] = useState('');
+  const router = useRouter();
+
+  // Handle email confirmation
+  useEffect(() => {
+    const handleEmailConfirmation = async () => {
+      const { error } = await supabase.auth.getSession();
+      if (error) {
+        setMessage(`Error: ${error.message}`);
+      }
+    };
+
+    // Check for email confirmation in URL
+    if (window.location.hash) {
+      handleEmailConfirmation();
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -43,11 +60,33 @@ export default function Auth() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
 
       if (error) throw error;
       
-      setMessage('Check your email for the confirmation link!');
+      setMessage('Check your email for the confirmation link! The link will expire in 24 hours.');
+    } catch (error) {
+      setMessage(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    try {
+      setLoading(true);
+      setMessage('');
+
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+      });
+
+      if (error) throw error;
+      setMessage('Confirmation email resent! Please check your inbox.');
     } catch (error) {
       setMessage(`Error: ${error.message}`);
     } finally {
@@ -111,6 +150,14 @@ export default function Auth() {
           {message && (
             <div className={`mt-4 p-3 px-4 rounded-lg text-[0.9rem] text-center ${message.includes('Error') ? 'bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca]' : 'bg-[#dcfce7] text-[#166534] border border-[#bbf7d0]'}`}>
               {message}
+              {message.includes('Check your email') && (
+                <button
+                  onClick={handleResendConfirmation}
+                  className="block w-full mt-2 text-[#4a6cf7] hover:underline"
+                >
+                  Resend confirmation email
+                </button>
+              )}
             </div>
           )}
         </form>

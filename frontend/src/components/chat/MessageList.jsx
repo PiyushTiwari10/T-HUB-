@@ -53,7 +53,7 @@ const MessageList = ({ messages, currentUser, onEditMessage, onDeleteMessage, on
     const messageGroups = groupMessagesByDate(messages);
 
     return (
-        <div className="space-y-6 px-2">
+        <div className="space-y-6 px-2 md:px-4">
             <AnimatePresence>
                 {messageGroups.map((group, groupIndex) => (
                     <div key={group.date} className="space-y-4">
@@ -81,7 +81,7 @@ const MessageList = ({ messages, currentUser, onEditMessage, onDeleteMessage, on
                                     className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
                                     ref={isLastMessage ? lastMessageRef : null}
                                 >
-                                    <div className={`flex ${isOwnMessage ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 max-w-[85%]`}>
+                                    <div className={`flex ${isOwnMessage ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 max-w-[90%] md:max-w-[85%]`}>
                                         {showAvatar && !isOwnMessage && (
                                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3498db] to-[#2c3e50] flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
                                                 {message.username?.charAt(0).toUpperCase()}
