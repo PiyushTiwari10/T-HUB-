@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaReddit, FaArrowUp, FaComment, FaExternalLinkAlt, FaSpinner } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_URL } from '../config';
 
 const RedditFeed = () => {
     const [posts, setPosts] = useState([]);
@@ -26,7 +27,7 @@ const RedditFeed = () => {
             setError(null);
             console.log(`Fetching posts from r/${selectedSubreddit}`);
             
-            const response = await fetch(`http://localhost:5000/api/reddit/${selectedSubreddit}`, {
+            const response = await fetch(`${API_URL}/api/reddit/${selectedSubreddit}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

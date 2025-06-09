@@ -7,6 +7,7 @@ import { FaArrowLeft, FaDownload, FaBook, FaLaptop, FaTools, FaCode, FaBug, FaLi
 import ChatRoom from './chat/ChatRoom';
 import ChatRoomList from './chat/ChatRoomList';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 const TechDetails = () => {
   const params = useParams();
@@ -24,7 +25,7 @@ const TechDetails = () => {
     const fetchTechDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/installations/${id}`);
+        const response = await axios.get(`${API_URL}/api/installations/${id}`);
         setTech(response.data);
         setError(null);
       } catch (err) {

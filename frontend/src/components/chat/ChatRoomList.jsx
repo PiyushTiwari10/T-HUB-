@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaUsers, FaTimes, FaSearch } from 'react-icons/fa';
+import { API_URL } from '../../config';
 
 const ChatRoomList = ({ onSelectRoom, currentUser, techId }) => {
     const [rooms, setRooms] = useState([]);
@@ -19,7 +20,7 @@ const ChatRoomList = ({ onSelectRoom, currentUser, techId }) => {
 
     const fetchRooms = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/chat/rooms/tech/${techId}${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''}`);
+            const response = await fetch(`${API_URL}/api/chat/rooms/tech/${techId}${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch chat rooms');
             }
@@ -34,7 +35,7 @@ const ChatRoomList = ({ onSelectRoom, currentUser, techId }) => {
     const handleCreateRoom = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/api/chat/rooms', {
+            const response = await fetch(`${API_URL}/api/chat/rooms`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

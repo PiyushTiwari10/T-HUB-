@@ -5,6 +5,7 @@ import MessageInput from './MessageInput';
 import ActiveUsers from './ActiveUsers';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaUsers, FaTimes, FaChevronLeft } from 'react-icons/fa';
+import { SOCKET_URL } from '../../config';
 
 const ChatRoom = ({ roomId, currentUser, onBack }) => {
     const [messages, setMessages] = useState([]);
@@ -42,7 +43,7 @@ const ChatRoom = ({ roomId, currentUser, onBack }) => {
         console.log('ChatRoom mounted with:', { roomId, currentUser });
         
         // Initialize socket connection
-        socketRef.current = io('http://localhost:5000', {
+        socketRef.current = io(SOCKET_URL, {
             reconnection: true,
             reconnectionAttempts: 5,
             reconnectionDelay: 1000

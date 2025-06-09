@@ -4,6 +4,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearch } from '../context/SearchContext';
 import { FaSearch, FaFilter } from 'react-icons/fa';
+import { API_URL } from '../config';
 
 const TechList = () => {
   const [technologies, setTechnologies] = useState([]);
@@ -17,7 +18,7 @@ const TechList = () => {
     const fetchTechnologies = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/installations');
+        const response = await axios.get(`${API_URL}/api/installations`);
         setTechnologies(response.data);
         const uniqueCategories = ['All', ...new Set(response.data.map(tech => tech.category).filter(Boolean))];
         setCategories(uniqueCategories);
