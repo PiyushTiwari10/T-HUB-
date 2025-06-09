@@ -4,8 +4,14 @@ const pool = require('./db');
 function initializeSocket(server) {
     const io = new Server(server, {
         cors: {
-            origin: process.env.FRONTEND_URL || "http://localhost:3000",
-            methods: ["GET", "POST"]
+            origin: [
+                'http://localhost:3000',
+                'https://t-hub-17jm.onrender.com',
+                'https://t-hub-five.vercel.app',
+                process.env.FRONTEND_URL
+            ].filter(Boolean),
+            methods: ["GET", "POST"],
+            credentials: true
         }
     });
 
