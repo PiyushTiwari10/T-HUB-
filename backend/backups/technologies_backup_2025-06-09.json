@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "Test Technology",
+    "category": "Testing",
+    "installation_steps": {
+      "steps": [
+        "Step 1: Install dependencies",
+        "Step 2: Configure settings"
+      ]
+    },
+    "commands": "npm install\nnpm start",
+    "version": "1.0.0",
+    "troubleshooting": {
+      "common_issues": [
+        "Issue 1: Check dependencies",
+        "Issue 2: Verify configuration"
+      ]
+    },
+    "description": "This is a test technology",
+    "download_link": "https://example.com/download",
+    "documentation_link": "https://example.com/docs",
+    "use_cases": [
+      "Testing",
+      "Development"
+    ],
+    "supported_platforms": [
+      "Windows",
+      "Linux",
+      "MacOS"
+    ],
+    "created_at": "2025-06-09T05:51:56.105Z"
+  }
+]
