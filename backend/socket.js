@@ -138,8 +138,18 @@ function initializeSocket(server) {
         // Send a message
         socket.on('send_message', async ({ roomId, message }, callback) => {
             try {
-                // Ensure chat room exists and get its ID
-                const chatRoomId = await ensureChatRoom(roomId);
+                // Get chat_room_id from room_id
+                const roomResult = await pool.query(
+                    'SELECT id FROM chat_rooms WHERE room_id = $1',
+                    [roomId]
+                );
+
+                if (roomResult.rows.length === 0) {
+                    if (callback) callback({ message: 'Room not found' });
+                    return;
+                }
+
+                const chatRoomId = roomResult.rows[0].id;
 
                 // Get username from active users
                 const username = activeUsers.get(roomId)?.get(socket.id)?.username;

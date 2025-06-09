@@ -81,6 +81,20 @@ router.post('/rooms', async (req, res) => {
 router.get('/rooms/:roomId/messages', async (req, res) => {
     try {
         const { roomId } = req.params;
+        
+        // First get the chat_room_id from room_id
+        const roomResult = await pool.query(
+            'SELECT id FROM chat_rooms WHERE room_id = $1',
+            [roomId]
+        );
+
+        if (roomResult.rows.length === 0) {
+            return res.json([]); // Return empty array if room doesn't exist
+        }
+
+        const chatRoomId = roomResult.rows[0].id;
+
+        // Then get messages for this chat_room_id
         const result = await pool.query(
             `SELECT m.*, 
                     (SELECT COUNT(*) FROM message_reactions WHERE message_id = m.id) as reaction_count
@@ -88,7 +102,7 @@ router.get('/rooms/:roomId/messages', async (req, res) => {
              WHERE m.chat_room_id = $1 
              ORDER BY m.created_at ASC 
              LIMIT 50`,
-            [roomId]
+            [chatRoomId]
         );
         res.json(result.rows);
     } catch (err) {
