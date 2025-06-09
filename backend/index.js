@@ -15,7 +15,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
     'http://localhost:3000',
     'https://t-hub-17jm.onrender.com',
-    'https://t-hub-frontend.vercel.app', // Add your frontend domain when deployed
+    'https://t-hub-five.vercel.app',
     process.env.FRONTEND_URL
 ].filter(Boolean); // Remove any undefined values
 
