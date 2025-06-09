@@ -126,13 +126,17 @@ const ChatRoom = ({ roomId, currentUser, onBack }) => {
     const fetchMessages = async () => {
         try {
             console.log('Fetching messages for room:', roomId);
-            const response = await fetch(`http://localhost:5000/api/chat/rooms/${roomId}/messages`);
+            const response = await fetch(`${SOCKET_URL}/api/chat/rooms/${roomId}/messages`);
             if (!response.ok) {
                 throw new Error('Failed to fetch messages');
             }
             const data = await response.json();
             console.log('Fetched messages:', data);
-            setMessages(data);
+            // Sort messages by created_at in ascending order
+            const sortedMessages = data.sort((a, b) => 
+                new Date(a.created_at) - new Date(b.created_at)
+            );
+            setMessages(sortedMessages);
         } catch (error) {
             console.error('Error fetching messages:', error);
             setError('Failed to load messages');

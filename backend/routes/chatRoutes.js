@@ -86,7 +86,7 @@ router.get('/rooms/:roomId/messages', async (req, res) => {
                     (SELECT COUNT(*) FROM message_reactions WHERE message_id = m.id) as reaction_count
              FROM messages m 
              WHERE m.chat_room_id = $1 
-             ORDER BY m.created_at DESC 
+             ORDER BY m.created_at ASC 
              LIMIT 50`,
             [roomId]
         );
