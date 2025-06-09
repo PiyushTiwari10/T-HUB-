@@ -12,12 +12,56 @@ const app = express();
 const server = http.createServer(app);
 
 // CORS configuration
+const allowedOrigins = [
+    'http://localhost:3000',
+    'https://t-hub-17jm.onrender.com',
+    'https://t-hub-frontend.vercel.app', // Add your frontend domain when deployed
+    process.env.FRONTEND_URL
+].filter(Boolean); // Remove any undefined values
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: function(origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Basic middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Root route
+app.get('/', (req, res) => {
+    res.json({ 
+        status: "ok", 
+        message: "T-HUB API is running",
+        version: "1.0.0",
+        endpoints: {
+            health: "/health",
+            installations: "/api/installations",
+            chat: "/api/chat",
+            reddit: "/api/reddit"
+        }
+    });
+});
+
+// Health check route
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: "ok", 
+        message: "API is healthy",
+        timestamp: new Date().toISOString()
+    });
+});
 
 // Initialize database tables
 const initializeDatabase = async () => {
@@ -82,11 +126,7 @@ const initializeDatabase = async () => {
 // Initialize database before starting the server
 initializeDatabase()
     .then(() => {
-        // Middleware
-        app.use(express.json());
-        app.use(express.urlencoded({ extended: true }));
-
-        // Routes
+        // API Routes
         app.use('/api', routes);
         app.use('/api/chat', chatRoutes);
         app.use('/api/reddit', redditRoutes);
