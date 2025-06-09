@@ -1,13 +1,11 @@
-require("dotenv").config(); // Load .env file
+// Load .env file
 const { Pool } = require("pg");
 
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASS,
-  port: process.env.DB_PORT,
-  ssl: false, // Disable SSL for local setup
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Required for Render's PostgreSQL
+  }
 });
 
 // Add username column to messages table if it doesn't exist

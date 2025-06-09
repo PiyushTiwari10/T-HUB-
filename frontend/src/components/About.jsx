@@ -43,7 +43,7 @@ const About = () => {
   ];
 
   const stats = [
-    { number: "100+", label: "Technologies Covered" },
+    { number: "350+", label: "Technologies Covered" },
     { number: "24/7", label: "Community Support" },
     { number: "50K+", label: "Monthly Users" },
     { number: "1000+", label: "Guides & Resources" }
