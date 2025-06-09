@@ -3,7 +3,7 @@ const router = express.Router();
 const axios = require('axios');
 
 // Reddit API configuration
-const REDDIT_API_URL = 'https://www.reddit.com/r';
+const REDDIT_API_URL = 'https://oauth.reddit.com/r';
 const REDDIT_CLIENT_ID = process.env.REDDIT_CLIENT_ID;
 const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET;
 
@@ -46,7 +46,8 @@ router.get('/:subreddit', cacheMiddleware, async (req, res) => {
                     password: REDDIT_CLIENT_SECRET
                 },
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'User-Agent': 'T-HUB Tech News Aggregator/1.0'
                 }
             }
         );
@@ -60,14 +61,15 @@ router.get('/:subreddit', cacheMiddleware, async (req, res) => {
 
         // Then fetch the posts using the access token
         console.log('Fetching posts with access token...');
-        const response = await axios.get(`${REDDIT_API_URL}/${subreddit}/hot.json`, {
+        const response = await axios.get(`${REDDIT_API_URL}/${subreddit}/hot`, {
             params: {
                 limit: 25,
                 raw_json: 1
             },
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
-                'User-Agent': 'T-HUB Tech News Aggregator/1.0'
+                'User-Agent': 'T-HUB Tech News Aggregator/1.0',
+                'Accept': 'application/json'
             }
         });
 
