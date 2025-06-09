@@ -22,7 +22,7 @@ app.use(cors({
 // Initialize database tables
 const initializeDatabase = async () => {
     try {
-        // Create technologies table
+        // Create technologies table first
         await pool.query(`
             CREATE TABLE IF NOT EXISTS technologies (
                 id SERIAL PRIMARY KEY,
@@ -40,6 +40,7 @@ const initializeDatabase = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
+        console.log('✅ Technologies table created/verified');
 
         // Create chat_rooms table
         await pool.query(`
@@ -53,45 +54,53 @@ const initializeDatabase = async () => {
                 is_active BOOLEAN DEFAULT true
             );
         `);
+        console.log('✅ Chat rooms table created/verified');
 
-        // Create messages table
+        // Create messages table with username column included
         await pool.query(`
             CREATE TABLE IF NOT EXISTS messages (
                 id SERIAL PRIMARY KEY,
                 chat_room_id INTEGER REFERENCES chat_rooms(id),
                 user_id VARCHAR(255) NOT NULL,
                 content TEXT NOT NULL,
+                username VARCHAR(255),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 is_edited BOOLEAN DEFAULT false,
                 edited_at TIMESTAMP,
-                parent_message_id INTEGER REFERENCES messages(id),
-                username VARCHAR(255)
+                parent_message_id INTEGER REFERENCES messages(id)
             );
         `);
+        console.log('✅ Messages table created/verified');
 
-        console.log('✅ Database tables initialized successfully');
+        console.log('✅ All database tables initialized successfully');
     } catch (err) {
         console.error('❌ Error initializing database tables:', err);
+        throw err; // Re-throw to prevent server start if DB init fails
     }
 };
 
 // Initialize database before starting the server
-initializeDatabase().then(() => {
-    // Middleware
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
+initializeDatabase()
+    .then(() => {
+        // Middleware
+        app.use(express.json());
+        app.use(express.urlencoded({ extended: true }));
 
-    // Routes
-    app.use('/api', routes);
-    app.use('/api/chat', chatRoutes);
-    app.use('/api/reddit', redditRoutes);
+        // Routes
+        app.use('/api', routes);
+        app.use('/api/chat', chatRoutes);
+        app.use('/api/reddit', redditRoutes);
 
-    // Initialize Socket.IO
-    initializeSocket(server);
+        // Initialize Socket.IO
+        initializeSocket(server);
 
-    // Start server
-    const PORT = process.env.PORT || 10000;
-    server.listen(PORT, () => {
-        console.log(`✅ Server running on port ${PORT}`);
+        // Start server
+        const PORT = process.env.PORT || 10000;
+        server.listen(PORT, () => {
+            console.log(`✅ Server running on port ${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error('❌ Failed to initialize database:', err);
+        process.exit(1); // Exit if database initialization fails
     });
-});
