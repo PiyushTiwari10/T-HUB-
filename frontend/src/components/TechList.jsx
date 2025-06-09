@@ -18,14 +18,26 @@ const TechList = () => {
     const fetchTechnologies = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/api/installations`);
+        console.log('Fetching technologies from:', `${API_URL}/api/installations`);
+        const response = await axios.get(`${API_URL}/api/installations`, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        console.log('Response received:', response.data);
         setTechnologies(response.data);
         const uniqueCategories = ['All', ...new Set(response.data.map(tech => tech.category).filter(Boolean))];
         setCategories(uniqueCategories);
         setError(null);
       } catch (err) {
-        setError('Failed to fetch technologies');
-        console.error(err);
+        console.error('Error details:', {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status,
+          url: err.config?.url
+        });
+        setError(`Failed to fetch technologies: ${err.message}`);
         setTechnologies([]);
       } finally {
         setLoading(false);
