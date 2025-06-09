@@ -7,6 +7,11 @@ const REDDIT_API_URL = 'https://www.reddit.com/r';
 const REDDIT_CLIENT_ID = process.env.REDDIT_CLIENT_ID;
 const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET;
 
+// Debug logging for environment variables
+console.log('Reddit API Configuration:');
+console.log('Client ID exists:', !!REDDIT_CLIENT_ID);
+console.log('Client Secret exists:', !!REDDIT_CLIENT_SECRET);
+
 // Cache configuration
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const cache = new Map();
@@ -31,6 +36,7 @@ router.get('/:subreddit', cacheMiddleware, async (req, res) => {
         console.log(`Fetching posts from r/${subreddit}`);
 
         // First, get an access token
+        console.log('Attempting to get access token...');
         const authResponse = await axios.post(
             'https://www.reddit.com/api/v1/access_token',
             `grant_type=client_credentials`,
@@ -45,9 +51,15 @@ router.get('/:subreddit', cacheMiddleware, async (req, res) => {
             }
         );
 
+        console.log('Access token response:', {
+            status: authResponse.status,
+            hasToken: !!authResponse.data?.access_token
+        });
+
         const accessToken = authResponse.data.access_token;
 
         // Then fetch the posts using the access token
+        console.log('Fetching posts with access token...');
         const response = await axios.get(`${REDDIT_API_URL}/${subreddit}/hot.json`, {
             params: {
                 limit: 25,
@@ -92,6 +104,7 @@ router.get('/:subreddit', cacheMiddleware, async (req, res) => {
         if (error.response) {
             console.error('Reddit API response:', error.response.data);
             console.error('Status:', error.response.status);
+            console.error('Headers:', error.response.headers);
         }
         
         // Provide more specific error messages
