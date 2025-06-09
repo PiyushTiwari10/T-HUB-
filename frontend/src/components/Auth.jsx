@@ -24,7 +24,15 @@ export default function Auth() {
     if (window.location.hash) {
       handleEmailConfirmation();
     }
-  }, []);
+
+    // Check for error parameter in URL
+    const error = router.query.error;
+    if (error) {
+      setMessage(`Error: ${decodeURIComponent(error)}`);
+      // Clear the error from URL
+      router.replace('/login', undefined, { shallow: true });
+    }
+  }, [router.query.error]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -40,7 +48,14 @@ export default function Auth() {
       });
 
       if (error) throw error;
+
+      // Check if email is verified
+      if (!data.user?.email_confirmed_at) {
+        throw new Error('Please verify your email before logging in');
+      }
+
       setMessage('Login successful!');
+      router.push('/');
       
     } catch (error) {
       setMessage(`Error: ${error.message}`);
@@ -61,7 +76,7 @@ export default function Auth() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `https://t-hub-five.vercel.app/auth/callback`,
           data: {
             email_verified: false
           }
