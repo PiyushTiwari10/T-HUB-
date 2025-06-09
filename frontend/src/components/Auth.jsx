@@ -85,7 +85,7 @@ export default function Auth() {
 
       if (error) throw error;
       
-      setMessage('Check your email for the confirmation link! The link will expire in 24 hours.');
+      setMessage('Check your email for the confirmation link! After clicking the link ,come back to the login page and login with your email and password.');
     } catch (error) {
       setMessage(`Error: ${error.message}`);
     } finally {
