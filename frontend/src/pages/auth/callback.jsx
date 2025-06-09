@@ -8,11 +8,28 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { error } = await supabase.auth.getSession();
-        if (error) throw error;
+        // Get the hash fragment from the URL
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        
+        // Check if we have the access token
+        if (params.get('access_token')) {
+          // Set the session using the hash fragment
+          const { error } = await supabase.auth.setSession({
+            access_token: params.get('access_token'),
+            refresh_token: params.get('refresh_token'),
+          });
 
-        // Redirect to home page after successful confirmation
-        router.push('/');
+          if (error) throw error;
+
+          // Clear the hash fragment
+          window.history.replaceState(null, '', window.location.pathname);
+
+          // Redirect to home page after successful confirmation
+          router.push('/');
+        } else {
+          throw new Error('No access token found');
+        }
       } catch (error) {
         console.error('Error handling auth callback:', error);
         // Redirect to login page with error

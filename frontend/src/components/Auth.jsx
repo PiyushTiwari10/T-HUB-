@@ -62,6 +62,9 @@ export default function Auth() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            email_verified: false
+          }
         },
       });
 
