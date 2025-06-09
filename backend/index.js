@@ -7,6 +7,7 @@ const routes = require('./routes'); // Import routes
 const chatRoutes = require('./routes/chatRoutes'); // Import chat routes
 const initializeSocket = require('./socket'); // Import socket initialization
 const redditRoutes = require('./routes/reddit');
+const createChatTables = require('./chatMigrations'); // Import chat migrations
 
 const app = express();
 const server = http.createServer(app);
@@ -86,35 +87,9 @@ const initializeDatabase = async () => {
         `);
         console.log('✅ Technologies table created/verified');
 
-        // Create chat_rooms table
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS chat_rooms (
-                id SERIAL PRIMARY KEY,
-                room_id VARCHAR(8) UNIQUE NOT NULL,
-                technology_id INTEGER REFERENCES technologies(id),
-                name VARCHAR(255) NOT NULL,
-                description TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                is_active BOOLEAN DEFAULT true
-            );
-        `);
-        console.log('✅ Chat rooms table created/verified');
-
-        // Create messages table with username column included
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS messages (
-                id SERIAL PRIMARY KEY,
-                chat_room_id INTEGER REFERENCES chat_rooms(id),
-                user_id VARCHAR(255) NOT NULL,
-                content TEXT NOT NULL,
-                username VARCHAR(255),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                is_edited BOOLEAN DEFAULT false,
-                edited_at TIMESTAMP,
-                parent_message_id INTEGER REFERENCES messages(id)
-            );
-        `);
-        console.log('✅ Messages table created/verified');
+        // Create chat tables
+        await createChatTables();
+        console.log('✅ Chat tables created/verified');
 
         console.log('✅ All database tables initialized successfully');
     } catch (err) {
