@@ -58,8 +58,6 @@ const createChatTables = async () => {
     } catch (err) {
         console.error('Error creating chat tables:', err);
         throw err;
-    } finally {
-        pool.end();
     }
 };
 

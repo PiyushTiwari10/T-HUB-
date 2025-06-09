@@ -17,18 +17,21 @@ function initializeSocket(server) {
         try {
             // Check if room exists
             const roomResult = await pool.query(
-                'SELECT id FROM chat_rooms WHERE id = $1',
+                'SELECT id FROM chat_rooms WHERE room_id = $1',
                 [roomId]
             );
 
             if (roomResult.rows.length === 0) {
                 // Create room if it doesn't exist
-                await pool.query(
-                    'INSERT INTO chat_rooms (id, name) VALUES ($1, $2)',
+                const newRoomResult = await pool.query(
+                    'INSERT INTO chat_rooms (room_id, name) VALUES ($1, $2) RETURNING id',
                     [roomId, `Chat Room ${roomId}`]
                 );
                 console.log(`Created new chat room: ${roomId}`);
+                return newRoomResult.rows[0].id;
             }
+
+            return roomResult.rows[0].id;
         } catch (error) {
             console.error('Error ensuring chat room exists:', error);
             throw error;
@@ -38,9 +41,10 @@ function initializeSocket(server) {
     // Function to add user to chat room members
     async function addUserToRoom(roomId, userId, username) {
         try {
+            const chatRoomId = await ensureChatRoom(roomId);
             await pool.query(
-                'INSERT INTO chat_room_members (chat_room_id, user_id) VALUES ($1, $2) ON CONFLICT (chat_room_id, user_id) DO NOTHING',
-                [roomId, userId]
+                'INSERT INTO chat_room_members (chat_room_id, user_id, username) VALUES ($1, $2, $3) ON CONFLICT (chat_room_id, user_id) DO UPDATE SET username = $3',
+                [chatRoomId, userId, username]
             );
         } catch (error) {
             console.error('Error adding user to room:', error);
@@ -51,9 +55,10 @@ function initializeSocket(server) {
     // Function to remove user from chat room members
     async function removeUserFromRoom(roomId, userId) {
         try {
+            const chatRoomId = await ensureChatRoom(roomId);
             await pool.query(
                 'DELETE FROM chat_room_members WHERE chat_room_id = $1 AND user_id = $2',
-                [roomId, userId]
+                [chatRoomId, userId]
             );
         } catch (error) {
             console.error('Error removing user from room:', error);
@@ -127,8 +132,8 @@ function initializeSocket(server) {
         // Send a message
         socket.on('send_message', async ({ roomId, message }, callback) => {
             try {
-                // Ensure chat room exists before sending message
-                await ensureChatRoom(roomId);
+                // Ensure chat room exists and get its ID
+                const chatRoomId = await ensureChatRoom(roomId);
 
                 // Get username from active users
                 const username = activeUsers.get(roomId)?.get(socket.id)?.username;
@@ -136,7 +141,7 @@ function initializeSocket(server) {
                 // Save message to database
                 const result = await pool.query(
                     'INSERT INTO messages (chat_room_id, user_id, content, username) VALUES ($1, $2, $3, $4) RETURNING *',
-                    [roomId, message.user_id, message.content, username]
+                    [chatRoomId, message.user_id, message.content, username]
                 );
 
                 const savedMessage = result.rows[0];
