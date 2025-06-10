@@ -80,26 +80,70 @@ const TechList = () => {
     }
   };
 
-  if (loading) return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex flex-col justify-center items-center min-h-[calc(100vh-200px)] text-gray-600"
-    >
+  if (loading) {
+    const loadingMessages = [
+      "Fetching the latest tech stacks...",
+      "Analyzing technology trends...",
+      "Preparing installation guides...",
+      "Loading development tools...",
+      "Almost there, tech enthusiasts!",
+      "Gathering tech insights..."
+    ];
+
+    return (
       <motion.div 
-        className="w-16 h-16 border-4 border-t-[#3498db] border-gray-200 rounded-full"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.p 
-        className="text-lg mt-4"
-        animate={{ opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex flex-col justify-center items-center min-h-[calc(100vh-200px)] text-gray-600"
       >
-        Loading technologies...
-      </motion.p>
-    </motion.div>
-  );
+        <motion.div 
+          className="relative w-24 h-24"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        >
+          <div className="absolute inset-0 border-4 border-t-[#3498db] border-r-[#2c3e50] border-b-[#3498db] border-l-[#2c3e50] rounded-full animate-spin" />
+          <div className="absolute inset-2 border-4 border-t-[#3498db] border-r-[#2c3e50] border-b-[#3498db] border-l-[#2c3e50] rounded-full animate-spin" style={{ animationDirection: 'reverse' }} />
+          <div className="absolute inset-4 border-4 border-t-[#3498db] border-r-[#2c3e50] border-b-[#3498db] border-l-[#2c3e50] rounded-full animate-spin" />
+        </motion.div>
+        <motion.div
+          className="mt-8 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <motion.p 
+            className="text-xl font-semibold text-[#2c3e50] mb-2"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            {loadingMessages[Math.floor(Math.random() * loadingMessages.length)]}
+          </motion.p>
+          <motion.div 
+            className="flex justify-center gap-2 mt-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <motion.div 
+              className="w-2 h-2 bg-[#3498db] rounded-full"
+              animate={{ scale: [1, 1.5, 1] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0 }}
+            />
+            <motion.div 
+              className="w-2 h-2 bg-[#3498db] rounded-full"
+              animate={{ scale: [1, 1.5, 1] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+            />
+            <motion.div 
+              className="w-2 h-2 bg-[#3498db] rounded-full"
+              animate={{ scale: [1, 1.5, 1] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+            />
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    );
+  }
   
   if (error) return (
     <motion.div 

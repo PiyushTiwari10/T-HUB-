@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaCode, FaUsers, FaRocket, FaLightbulb, FaTools, FaBook, FaChartLine, FaShieldAlt } from 'react-icons/fa';
+import { FaCode, FaUsers, FaRocket, FaLightbulb, FaTools, FaBook, FaChartLine, FaShieldAlt, FaComments } from 'react-icons/fa';
 
 const About = () => {
   const fadeInUp = {
@@ -26,9 +26,9 @@ const About = () => {
       description: "Solutions to common issues and challenges, with detailed explanations and best practices for problem resolution."
     },
     {
-      icon: <FaBook className="text-3xl" />,
-      title: "Best Practices",
-      description: "Industry-standard approaches and methodologies for implementing technologies effectively and efficiently."
+      icon: <FaComments className="text-3xl" />,
+      title: "Interactive Rooms & Chat",
+      description: "Create and join topic-specific rooms to discuss, collaborate, and share knowledge with other developers in real-time."
     },
     {
       icon: <FaChartLine className="text-3xl" />,
@@ -45,7 +45,7 @@ const About = () => {
   const stats = [
     { number: "350+", label: "Technologies Covered" },
     { number: "24/7", label: "Community Support" },
-    { number: "50K+", label: "Monthly Users" },
+    { number: "50+", label: "Active Chat Rooms" },
     { number: "1000+", label: "Guides & Resources" }
   ];
 
@@ -152,7 +152,7 @@ const About = () => {
               Share your knowledge, learn from others, and stay updated with the latest in technology.
             </p>
             <motion.a
-              href="https://github.com/PiyushTiwari10/T-HUB-"
+              href="https://discord.gg/AWrXQ3KK"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
