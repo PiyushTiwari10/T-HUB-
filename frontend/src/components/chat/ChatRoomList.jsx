@@ -3,9 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaUsers, FaTimes, FaSearch } from 'react-icons/fa';
 import { API_URL } from '../../config';
 
-const ChatRoomList = ({ onSelectRoom, currentUser, techId }) => {
+const ChatRoomList = ({ onSelectRoom, currentUser, techId, hideHeader = false, showCreateModal, setShowCreateModal }) => {
     const [rooms, setRooms] = useState([]);
-    const [showCreateModal, setShowCreateModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [newRoom, setNewRoom] = useState({
         name: '',
@@ -60,17 +59,19 @@ const ChatRoomList = ({ onSelectRoom, currentUser, techId }) => {
     return (
         <div className="flex flex-col h-full bg-white rounded-lg shadow-lg overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#3498db] to-[#2c3e50] text-white">
-                <h2 className="text-lg font-semibold">Chat Rooms</h2>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowCreateModal(true)}
-                    className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                >
-                    <FaPlus className="w-5 h-5" />
-                </motion.button>
-            </div>
+            {!hideHeader && (
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#3498db] to-[#2c3e50] text-white">
+                    <h2 className="text-lg font-semibold">Chat Rooms</h2>
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setShowCreateModal(true)}
+                        className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                    >
+                        <FaPlus className="w-5 h-5" />
+                    </motion.button>
+                </div>
+            )}
 
             {/* Search Bar */}
             <div className="p-4 border-b">
@@ -134,73 +135,75 @@ const ChatRoomList = ({ onSelectRoom, currentUser, techId }) => {
             {/* Create Room Modal */}
             <AnimatePresence>
                 {showCreateModal && (
-                    <>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black/50 z-40"
+                            className="absolute inset-0 bg-black/50"
                             onClick={() => setShowCreateModal(false)}
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-lg shadow-xl z-50 p-6"
+                            className="relative w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden"
                         >
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-800">Create New Chat Room</h3>
-                                <button
-                                    onClick={() => setShowCreateModal(false)}
-                                    className="p-2 rounded-full hover:bg-gray-100"
-                                >
-                                    <FaTimes className="w-5 h-5 text-gray-500" />
-                                </button>
-                            </div>
-                            <form onSubmit={handleCreateRoom} className="space-y-4">
-                                <div>
-                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Room Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="name"
-                                        value={newRoom.name}
-                                        onChange={(e) => setNewRoom(prev => ({ ...prev, name: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3498db]"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Description (optional)
-                                    </label>
-                                    <textarea
-                                        id="description"
-                                        value={newRoom.description}
-                                        onChange={(e) => setNewRoom(prev => ({ ...prev, description: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3498db]"
-                                        rows={3}
-                                    />
-                                </div>
-                                <div className="flex justify-end gap-3">
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-semibold text-gray-800">Create New Chat Room</h3>
                                     <button
-                                        type="button"
                                         onClick={() => setShowCreateModal(false)}
-                                        className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                        className="p-2 rounded-full hover:bg-gray-100"
                                     >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 bg-[#3498db] text-white rounded-lg hover:bg-[#2980b9] transition-colors"
-                                    >
-                                        Create Room
+                                        <FaTimes className="w-5 h-5 text-gray-500" />
                                     </button>
                                 </div>
-                            </form>
+                                <form onSubmit={handleCreateRoom} className="space-y-4">
+                                    <div>
+                                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Room Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            value={newRoom.name}
+                                            onChange={(e) => setNewRoom(prev => ({ ...prev, name: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3498db]"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Description (optional)
+                                        </label>
+                                        <textarea
+                                            id="description"
+                                            value={newRoom.description}
+                                            onChange={(e) => setNewRoom(prev => ({ ...prev, description: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3498db]"
+                                            rows={3}
+                                        />
+                                    </div>
+                                    <div className="flex justify-end gap-3 pt-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCreateModal(false)}
+                                            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="px-4 py-2 bg-[#3498db] text-white rounded-lg hover:bg-[#2980b9] transition-colors"
+                                        >
+                                            Create Room
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </motion.div>
-                    </>
+                    </div>
                 )}
             </AnimatePresence>
         </div>

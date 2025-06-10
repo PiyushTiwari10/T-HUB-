@@ -4,10 +4,10 @@ import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import ActiveUsers from './ActiveUsers';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUsers, FaTimes, FaChevronLeft } from 'react-icons/fa';
+import { FaUsers, FaTimes, FaChevronLeft, FaSignOutAlt } from 'react-icons/fa';
 import { SOCKET_URL } from '../../config';
 
-const ChatRoom = ({ roomId, currentUser, onBack }) => {
+const ChatRoom = ({ roomId, currentUser, onBack, hideHeader = false }) => {
     const [messages, setMessages] = useState([]);
     const [activeUsers, setActiveUsers] = useState([]);
     const [typingUsers, setTypingUsers] = useState(new Map());
@@ -197,8 +197,15 @@ const ChatRoom = ({ roomId, currentUser, onBack }) => {
     };
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
     };
+
+    // Scroll to bottom when messages change
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     const handleSendMessage = (content) => {
         console.log('Sending message:', content);
@@ -285,48 +292,60 @@ const ChatRoom = ({ roomId, currentUser, onBack }) => {
     console.log('Current messages state:', messages);
 
     return (
-        <div className="flex flex-col h-[calc(100vh-2rem)] md:h-[500px] bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="flex flex-col h-full bg-white">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#3498db] to-[#2c3e50] text-white">
-                <div className="flex items-center gap-3">
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={onBack}
-                        className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                    >
-                        <FaChevronLeft className="w-5 h-5" />
-                    </motion.button>
-                    <div>
-                        <h2 className="text-lg font-semibold truncate max-w-[150px] md:max-w-none">Community Chat</h2>
-                        <p className="text-sm text-gray-200 font-mono truncate max-w-[150px] md:max-w-none">Room ID: {roomId}</p>
+            {!hideHeader && (
+                <div className="flex-shrink-0 flex items-center justify-between p-4 bg-gradient-to-r from-[#3498db] to-[#2c3e50] text-white">
+                    <div className="flex items-center gap-3">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={onBack}
+                            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                        >
+                            <FaChevronLeft className="w-5 h-5" />
+                        </motion.button>
+                        <div>
+                            <h2 className="text-lg font-semibold truncate max-w-[150px] md:max-w-none">Community Chat</h2>
+                            <p className="text-sm text-gray-200 font-mono truncate max-w-[150px] md:max-w-none">Room ID: {roomId}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setShowUsers(!showUsers)}
+                            className="p-2 rounded-full hover:bg-white/10 transition-colors relative"
+                        >
+                            <FaUsers className="w-5 h-5" />
+                            {activeUsers.length > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                    {activeUsers.length}
+                                </span>
+                            )}
+                        </motion.button>
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={onBack}
+                            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                            title="Exit Chat"
+                        >
+                            <FaSignOutAlt className="w-5 h-5" />
+                        </motion.button>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => setShowUsers(!showUsers)}
-                        className="p-2 rounded-full hover:bg-white/10 transition-colors relative"
-                    >
-                        <FaUsers className="w-5 h-5" />
-                        {activeUsers.length > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                {activeUsers.length}
-                            </span>
-                        )}
-                    </motion.button>
-                </div>
-            </div>
+            )}
 
             {/* Main Content */}
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex-1 flex min-h-0">
                 {/* Messages Area */}
                 <div 
                     ref={chatContainerRef}
-                    className={`flex-1 flex flex-col overflow-hidden ${showUsers && isMobile ? 'hidden' : 'block'}`}
+                    className={`flex-1 flex flex-col min-h-0 ${showUsers && isMobile ? 'hidden' : 'block'}`}
                 >
-                    <div className="flex-1 overflow-y-auto p-4 scroll-smooth">
+                    {/* Messages Container */}
+                    <div className="flex-1 overflow-y-auto">
                         <MessageList
                             messages={messages}
                             currentUser={currentUser}
@@ -335,43 +354,49 @@ const ChatRoom = ({ roomId, currentUser, onBack }) => {
                             onReaction={handleReaction}
                             onRemoveReaction={handleRemoveReaction}
                         />
-                        <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Typing Indicator */}
-                    <AnimatePresence>
-                        {typingUsers.size > 0 && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                className="px-4 py-2 text-sm text-gray-500 italic bg-gray-50"
-                            >
-                                {Array.from(typingUsers.values()).join(', ')} {typingUsers.size === 1 ? 'is' : 'are'} typing...
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    {/* Fixed Bottom Section */}
+                    <div className="sticky bottom-0 left-0 right-0 bg-white border-t">
+                        {/* Typing Indicator */}
+                        <AnimatePresence>
+                            {typingUsers.size > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    className="px-4 py-2 text-sm text-gray-500 italic bg-gray-50"
+                                >
+                                    {Array.from(typingUsers.values()).join(', ')} {typingUsers.size === 1 ? 'is' : 'are'} typing...
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
-                    {/* Error Message */}
-                    <AnimatePresence>
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                className="px-4 py-2 text-sm text-red-500 bg-red-50"
-                            >
-                                {error}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                        {/* Error Message */}
+                        <AnimatePresence>
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    className="px-4 py-2 text-sm text-red-500 bg-red-50"
+                                >
+                                    {error}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
-                    {/* Message Input */}
-                    <MessageInput
-                        onSendMessage={handleSendMessage}
-                        onTyping={() => socketRef.current?.emit('typing', { roomId, userId: currentUser.id, username: currentUser.username })}
-                        onStopTyping={() => socketRef.current?.emit('stop_typing', { roomId, userId: currentUser.id })}
-                    />
+                        {/* Message Input */}
+                        <MessageInput
+                            onSendMessage={(content) => {
+                                handleSendMessage(content);
+                                // Scroll to bottom after sending message
+                                setTimeout(scrollToBottom, 100);
+                            }}
+                            onTyping={() => socketRef.current?.emit('typing', { roomId, userId: currentUser.id, username: currentUser.username })}
+                            onStopTyping={() => socketRef.current?.emit('stop_typing', { roomId, userId: currentUser.id })}
+                        />
+                    </div>
                 </div>
 
                 {/* Active Users Sidebar */}
@@ -382,9 +407,9 @@ const ChatRoom = ({ roomId, currentUser, onBack }) => {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 20 }}
-                            className={`${isMobile ? 'fixed inset-0 z-50 bg-white' : 'w-64 border-l'} flex flex-col`}
+                            className={`${isMobile ? 'fixed inset-0 z-50 bg-white' : 'w-64 border-l'} flex flex-col min-h-0`}
                         >
-                            <div className="p-4 border-b flex items-center justify-between">
+                            <div className="flex-shrink-0 p-4 border-b flex items-center justify-between">
                                 <h3 className="font-semibold">Active Users</h3>
                                 {isMobile && (
                                     <button

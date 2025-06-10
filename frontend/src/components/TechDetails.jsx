@@ -3,7 +3,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft, FaDownload, FaBook, FaLaptop, FaTools, FaCode, FaBug, FaLightbulb, FaComments } from 'react-icons/fa';
+import { FaArrowLeft, FaDownload, FaBook, FaLaptop, FaTools, FaCode, FaBug, FaLightbulb, FaComments, FaChevronLeft, FaPlus } from 'react-icons/fa';
 import ChatRoom from './chat/ChatRoom';
 import ChatRoomList from './chat/ChatRoomList';
 import { useAuth } from '../context/AuthContext';
@@ -19,6 +19,7 @@ const TechDetails = () => {
   const [copied, setCopied] = useState(false);
   const { user } = useAuth();
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -320,29 +321,63 @@ const TechDetails = () => {
                 <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="h-[600px] flex flex-col"
+                  className="fixed inset-0 z-50 bg-white"
                 >
                   {user ? (
-                    <div className="flex-1 flex flex-col">
-                      {selectedRoom ? (
-                        <ChatRoom 
-                          roomId={selectedRoom.id} 
-                          currentUser={{
-                            id: user.id,
-                            username: user.user_metadata?.full_name || user.email
-                          }}
-                          onBack={() => setSelectedRoom(null)}
-                        />
-                      ) : (
-                        <ChatRoomList
-                          onSelectRoom={(room) => setSelectedRoom(room)}
-                          currentUser={{
-                            id: user.id,
-                            username: user.user_metadata?.full_name || user.email
-                          }}
-                          techId={id}
-                        />
-                      )}
+                    <div className="h-full flex flex-col">
+                      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#3498db] to-[#2c3e50] text-white">
+                        <div className="flex items-center">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => selectedRoom ? setSelectedRoom(null) : setActiveTab('installation')}
+                            className="p-2 rounded-full hover:bg-white/10 transition-colors mr-3"
+                            title={selectedRoom ? "Back to Chat Rooms" : "Go Back"}
+                          >
+                            <FaChevronLeft className="w-5 h-5" />
+                          </motion.button>
+                          <h2 className="text-lg font-semibold">
+                            {selectedRoom ? selectedRoom.name : "Chat Rooms"}
+                          </h2>
+                        </div>
+                        {!selectedRoom && (
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setShowCreateModal(true)}
+                            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                            title="Create New Room"
+                          >
+                            <FaPlus className="w-5 h-5" />
+                          </motion.button>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        {selectedRoom ? (
+                          <ChatRoom 
+                            roomId={selectedRoom.id} 
+                            currentUser={{
+                              id: user.id,
+                              username: user.user_metadata?.full_name || user.email,
+                              email: user.email
+                            }}
+                            onBack={() => setSelectedRoom(null)}
+                            hideHeader={true}
+                          />
+                        ) : (
+                          <ChatRoomList
+                            onSelectRoom={(room) => setSelectedRoom(room)}
+                            currentUser={{
+                              id: user.id,
+                              username: user.user_metadata?.full_name || user.email
+                            }}
+                            techId={id}
+                            hideHeader={true}
+                            showCreateModal={showCreateModal}
+                            setShowCreateModal={setShowCreateModal}
+                          />
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <motion.div 

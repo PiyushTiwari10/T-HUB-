@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FaPaperPlane, FaSmile } from 'react-icons/fa';
+import { FaPaperPlane } from 'react-icons/fa';
 
 const MessageInput = ({ onSendMessage, onTyping, onStopTyping }) => {
     const [message, setMessage] = useState('');
@@ -95,21 +95,12 @@ const MessageInput = ({ onSendMessage, onTyping, onStopTyping }) => {
                         rows={1}
                         className={`w-full resize-none rounded-lg border ${
                             isFocused ? 'border-blue-500' : 'border-gray-300'
-                        } p-2 md:p-3 pr-10 md:pr-12 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-base`}
+                        } p-2 md:p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-base`}
                         style={{ 
                             minHeight: '40px', 
-                            maxHeight: '120px',
-                            paddingRight: '2.5rem'
+                            maxHeight: '120px'
                         }}
                     />
-                    <motion.button
-                        type="button"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="absolute right-2 bottom-2 p-1.5 md:p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                        <FaSmile className="w-4 h-4 md:w-5 md:h-5" />
-                    </motion.button>
                 </div>
                 <motion.button
                     type="submit"
