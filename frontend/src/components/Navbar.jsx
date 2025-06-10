@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaHome, FaSearch, FaGithub, FaInfoCircle, FaBars, FaTimes, FaNewspaper } from 'react-icons/fa';
+import { FaHome, FaSearch, FaInfoCircle, FaBars, FaTimes, FaNewspaper } from 'react-icons/fa';
 import LogoutButton from './LogoutButton';
+import Feedback from './Feedback';
 import { useSearch } from '../context/SearchContext';
 
 const Navbar = () => {
@@ -98,11 +99,7 @@ const Navbar = () => {
               </Link>
             </li>
             <li className="my-2.5 md:my-0 md:mx-3 w-full md:w-auto">
-              <a href="https://github.com/PiyushTiwari10/T-HUB-" target="_blank" rel="noopener noreferrer" className={`${navLinkClasses}`}>
-                <FaGithub />
-                <span>GitHub</span>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#3498db] transition-all duration-300 group-hover:w-full md:block hidden"></span>
-              </a>
+              <Feedback />
             </li>
             <li className="my-2.5 md:my-0 md:ml-3 md:flex md:items-center w-full md:w-auto">
               <LogoutButton className={logoutButtonNavbarClasses} />
