@@ -54,8 +54,22 @@ export default function Auth() {
         throw new Error('Please verify your email before logging in');
       }
 
-      setMessage('Login successful!');
-      router.push('/');
+      // Check if this is the user's first login by checking their metadata
+      const { data: { user } } = await supabase.auth.getUser();
+      const isFirstLogin = !user?.user_metadata?.has_logged_in;
+
+      if (isFirstLogin) {
+        // Update user metadata to mark that they have logged in
+        await supabase.auth.updateUser({
+          data: { has_logged_in: true }
+        });
+        
+        // Redirect to home page
+        router.push('/');
+      } else {
+        // For subsequent logins, redirect to home page
+        router.push('/');
+      }
       
     } catch (error) {
       setMessage(`Error: ${error.message}`);

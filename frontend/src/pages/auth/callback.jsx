@@ -15,7 +15,8 @@ export default function AuthCallback() {
         
         if (!hash) {
           setStatus('success');
-          setMessage('Registration successful! You can now go back and login with your credentials.');
+          setMessage('Registration successful! Redirecting to home page...');
+          setTimeout(() => router.push('/'), 2000);
           return;
         }
 
@@ -25,7 +26,8 @@ export default function AuthCallback() {
 
         if (!accessToken || !refreshToken) {
           setStatus('success');
-          setMessage('Registration successful! You can now go back and login with your credentials.');
+          setMessage('Registration successful! Redirecting to home page...');
+          setTimeout(() => router.push('/'), 2000);
           return;
         }
 
@@ -37,7 +39,8 @@ export default function AuthCallback() {
 
         if (sessionError) {
           setStatus('success');
-          setMessage('Registration successful! You can now go back and login with your credentials.');
+          setMessage('Registration successful! Redirecting to home page...');
+          setTimeout(() => router.push('/'), 2000);
           return;
         }
 
@@ -45,15 +48,17 @@ export default function AuthCallback() {
         window.history.replaceState(null, '', window.location.pathname);
 
         setStatus('success');
-        setMessage('Registration successful! You can now go back and login with your credentials.');
+        setMessage('Registration successful! Redirecting to home page...');
+        setTimeout(() => router.push('/'), 2000);
       } catch (error) {
         setStatus('success');
-        setMessage('Registration successful! You can now go back and login with your credentials.');
+        setMessage('Registration successful! Redirecting to home page...');
+        setTimeout(() => router.push('/'), 2000);
       }
     };
 
     handleAuthCallback();
-  }, []);
+  }, [router]);
 
   const handleLoginRedirect = () => {
     // Get the current domain and construct the login URL
