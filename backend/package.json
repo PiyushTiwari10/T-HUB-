@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon backend/index.js",
-    "setup-neon": "node setupNeon.js"
+    "setup-neon": "node setupNeon.js",
+    "transfer-data": "node transferToNeon.js"
   },
   "keywords": [],
   "author": "",
