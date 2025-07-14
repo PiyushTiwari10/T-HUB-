@@ -8,6 +8,9 @@ const chatRoutes = require('./routes/chatRoutes'); // Import chat routes
 const initializeSocket = require('./socket'); // Import socket initialization
 const redditRoutes = require('./routes/reddit');
 const createChatTables = require('./chatMigrations'); // Import chat migrations
+const { job: keepAliveJob } = require('./keepAlive');
+
+keepAliveJob.start();
 
 const app = express();
 const server = http.createServer(app);
